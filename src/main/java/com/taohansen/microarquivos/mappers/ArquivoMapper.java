@@ -22,6 +22,21 @@ public class ArquivoMapper {
         return dto;
     }
 
+    public ArquivoDTO toDto(Arquivo arquivo) {
+        if (arquivo == null) {
+            return null;
+        }
+        ArquivoDTO dto = new ArquivoDTO();
+        dto.setId(arquivo.getId());
+        dto.setNome(arquivo.getNome());
+        dto.setFilename(arquivo.getFilename());
+        dto.setDescricao(arquivo.getDescricao());
+        dto.setTamanho(arquivo.getTamanho());
+        dto.setTipoMime(arquivo.getTipoMime());
+        dto.setConteudo(arquivo.getConteudo());
+        return dto;
+    }
+
     public Arquivo toEntity(ArquivoDTO dto) {
         if (dto == null) {
             return null;

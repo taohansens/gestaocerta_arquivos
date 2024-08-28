@@ -2,6 +2,7 @@ package com.taohansen.microarquivos.services;
 
 import com.taohansen.microarquivos.config.EmpregadoClient;
 import com.taohansen.microarquivos.config.EmpregadoDTO;
+import com.taohansen.microarquivos.dtos.ArquivoDTO;
 import com.taohansen.microarquivos.dtos.ArquivoMinDTO;
 import com.taohansen.microarquivos.dtos.ArquivoUploadDTO;
 import com.taohansen.microarquivos.entities.Arquivo;
@@ -60,12 +61,11 @@ public class ArquivoService {
                 .collect(Collectors.toList());
     }
 
-    //TODO adjust to Return DTO
-    public Arquivo baixarArquivo(String arquivoId, Long empregadoId) {
+    public ArquivoDTO baixarArquivo(String arquivoId, Long empregadoId) {
         Arquivo arquivo =  repository.findById(arquivoId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Arquivo não encontrado %s", arquivoId)));
         if(Objects.equals(arquivo.getEmpregadoId(), empregadoId)){
-            return arquivo;
+            return arquivoMapper.toDto(arquivo);
         } else {
             throw new FileAccessException("Arquivo não pertence ao usuário informado.");
         }

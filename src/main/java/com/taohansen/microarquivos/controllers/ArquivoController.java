@@ -1,8 +1,8 @@
 package com.taohansen.microarquivos.controllers;
 
+import com.taohansen.microarquivos.dtos.ArquivoDTO;
 import com.taohansen.microarquivos.dtos.ArquivoMinDTO;
 import com.taohansen.microarquivos.dtos.ArquivoUploadDTO;
-import com.taohansen.microarquivos.entities.Arquivo;
 import com.taohansen.microarquivos.services.ArquivoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -42,7 +42,7 @@ public class ArquivoController {
 
     @GetMapping("/{arquivoId}/download")
     public ResponseEntity<Resource> downloadArquivo(@PathVariable Long empregadoId, @PathVariable String arquivoId) {
-        Arquivo arquivo = service.baixarArquivo(arquivoId, empregadoId);
+        ArquivoDTO arquivo = service.baixarArquivo(arquivoId, empregadoId);
         ByteArrayResource resource = new ByteArrayResource(arquivo.getConteudo());
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(arquivo.getTipoMime()))
