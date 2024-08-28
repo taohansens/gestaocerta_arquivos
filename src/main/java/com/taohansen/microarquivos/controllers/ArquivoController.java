@@ -22,25 +22,13 @@ import java.util.List;
 public class ArquivoController {
     private final ArquivoService service;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ArquivoMinDTO> uploadArquivo (@PathVariable Long empregadoId,
-                                                        @RequestParam("file") MultipartFile file,
-                                                        @RequestParam("nome") String nome,
-                                                        @RequestParam("descricao") String descricao) {
-        ArquivoUploadDTO arquivoDTO = new ArquivoUploadDTO();
-        arquivoDTO.setNome(nome);
-        arquivoDTO.setDescricao(descricao);
-        ArquivoMinDTO entity = service.insert(empregadoId, arquivoDTO, file);
-        return ResponseEntity.status(HttpStatus.CREATED).body(entity);
-    }
-
     @GetMapping
     public ResponseEntity<List<ArquivoMinDTO>> listarArquivos(@PathVariable Long empregadoId) {
         List<ArquivoMinDTO> arquivos = service.getByEmpregadoId(empregadoId);
         return ResponseEntity.ok(arquivos);
     }
 
-    @GetMapping("/{arquivoId}/download")
+    @GetMapping("/{arquivoId}")
     public ResponseEntity<Resource> downloadArquivo(@PathVariable Long empregadoId, @PathVariable String arquivoId) {
         ArquivoDTO arquivo = service.baixarArquivo(arquivoId, empregadoId);
         ByteArrayResource resource = new ByteArrayResource(arquivo.getConteudo());
@@ -48,5 +36,23 @@ public class ArquivoController {
                 .contentType(MediaType.parseMediaType(arquivo.getTipoMime()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + arquivo.getFilename() + "\"")
                 .body(resource);
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ArquivoMinDTO> uploadArquivo(@PathVariable Long empregadoId,
+                                                       @RequestParam("file") MultipartFile file,
+                                                       @RequestParam("nome") String nome,
+                                                       @RequestParam("descricao") String descricao) {
+        ArquivoUploadDTO arquivoDTO = new ArquivoUploadDTO();
+        arquivoDTO.setNome(nome);
+        arquivoDTO.setDescricao(descricao);
+        ArquivoMinDTO entity = service.insert(empregadoId, arquivoDTO, file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(entity);
+    }
+
+    @DeleteMapping("/{arquivoId}")
+    public ResponseEntity<Void> deleteArquivo(@PathVariable String arquivoId, @PathVariable Long empregadoId) {
+        service.deleteArquivo(arquivoId, empregadoId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -8,6 +8,7 @@ import com.taohansen.microarquivos.dtos.ArquivoUploadDTO;
 import com.taohansen.microarquivos.entities.Arquivo;
 import com.taohansen.microarquivos.mappers.ArquivoMapper;
 import com.taohansen.microarquivos.repositories.ArquivoRepository;
+import com.taohansen.microarquivos.services.exceptions.DatabaseException;
 import com.taohansen.microarquivos.services.exceptions.FileAccessException;
 import com.taohansen.microarquivos.services.exceptions.FileManagerException;
 import com.taohansen.microarquivos.services.exceptions.ResourceNotFoundException;
@@ -62,10 +63,24 @@ public class ArquivoService {
     }
 
     public ArquivoDTO baixarArquivo(String arquivoId, Long empregadoId) {
-        Arquivo arquivo =  repository.findById(arquivoId)
+        Arquivo arquivo = repository.findById(arquivoId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Arquivo não encontrado %s", arquivoId)));
-        if(Objects.equals(arquivo.getEmpregadoId(), empregadoId)){
+        if (Objects.equals(arquivo.getEmpregadoId(), empregadoId)) {
             return arquivoMapper.toDto(arquivo);
+        } else {
+            throw new FileAccessException("Arquivo não pertence ao usuário informado.");
+        }
+    }
+
+    public void deleteArquivo(String arquivoId, Long empregadoId) {
+        Arquivo arquivo = repository.findById(arquivoId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Arquivo não encontrado %s", arquivoId)));
+        if (Objects.equals(arquivo.getEmpregadoId(), empregadoId)) {
+            try {
+                repository.delete(arquivo);
+            } catch (Exception e) {
+                throw new DatabaseException("Houve um erro ao excluir o arquivo no Banco de Dados.");
+            }
         } else {
             throw new FileAccessException("Arquivo não pertence ao usuário informado.");
         }
